@@ -30,13 +30,14 @@ const schema = makeExecutableSchema({ typeDefs: [constraintDirectiveTypeDefs, ty
 const server = new ApolloServer({
     schema,
     formatError: (formattedError, error) => {
-        console.log("Format_err", formattedError.message);
+        console.log("Format_err", formattedError);
         console.log("custom_Err", error);
         return {
             ...formattedError,
-            message: "Your query doesn't match the schema. Try double-checking it!",
+            statusCode: formattedError.extensions.statusCode,
+            message: formattedError.message
         };
-    }
+    },
     // formatError: (formattedError, error) => {
     //     if (formattedError.message.startsWith('Database Error: ')) {
     //       return { message: 'Internal server error' };
@@ -49,7 +50,7 @@ const server = new ApolloServer({
 
 const handleRunServer = async () => {
     const { url } = await startStandaloneServer(server, {
-        listen: { port: 4050 },
+        listen: { port: process.env.PORT || 4000 },
         // context: async ({ req, res }) => ({
         //     authScope: getScope(req.headers.authorization),
         //   }),
