@@ -45,26 +45,6 @@ const server = new ApolloServer({
     //     // Otherwise return the formatted error.
     //     return formattedError;
     //   }
-    // formatError: async (formattedError, error) => {
-    //     console.log("Format_err", formattedError);
-    //     console.log("custom_Err", error);
-    // if(error){
-    //     return new GraphQLError("no error", {
-    //         errors: { code: 'YOUR_ERROR_CODE' },
-    //       });
-    // handleError(formattedError.message, "", 900);
-    // }
-    // return new GraphQLError({ errors: [{ message: 'YOUR_ERROR_CODE' }] });
-    // return {
-    //     errors: [{ message: 'YOUR_ERROR_CODE' }]
-    // }
-    // return {
-    // handleError("Your query doesn't match the schema. Try double-checking it!", "", 900)
-    // ...formattedError,
-    // error
-    //   };
-    // return formattedError;
-    // }
 });
 
 const handleRunServer = async () => {
