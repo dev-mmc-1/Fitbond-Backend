@@ -7,7 +7,8 @@ const UserSchema = new Schema({
     fullName: { type: String, required: false },
     mobileNumber: { type: String, required: false },
     gender: { type: String, required: false },
-    newUser: { type: Boolean, required: false }
+    newUser: { type: Boolean, required: false },
+    deviceId: { type: Array, required: false }
     // interest: { type: Array, required: false }
 });
 

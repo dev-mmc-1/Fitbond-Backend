@@ -25,7 +25,6 @@ input resetPasswordInput {
   password: String
 }
 
-
 type showMessage {
    message: String
 }
@@ -49,14 +48,13 @@ input addSportInput {
   image: String
 }
 
+input logoutUserInput {
+  token: String!
+}
+
 type Sport {
   name: String!
   image: String
-}
-
-type Book {
-  author: String
-  title: String
 }
 
 type Query {
@@ -71,6 +69,7 @@ type Mutation {
   resetPassword(input: resetPasswordInput!): showMessage
   addUserInterest(input: [addUserInterestType]!): showMessage
   addSport(input: addSportInput!): showMessage
+  logoutUser(input: logoutUserInput!): showMessage
 }
 `;
 

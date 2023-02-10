@@ -11,7 +11,7 @@ const moment = require('moment');
 const bcrypt = require("bcrypt");
 require('dotenv').config();
 var ObjectId = require('mongoose').Types.ObjectId;
-const { INVALIDEMAILORPASSWORD, INTERNALSERVER, USERALREADYEXISTS, EMAILNOTEXISTS, FULLNAMEREQUIRED, MOBILEREQUIRED, GENDERREQUIRED, PASSWORDREQUIRED, EMAILREQUIRED, EMAILFORMATEQUIRED, OTPLENGTH, OTPNOTEXISTS, PASSWORDGT, PASSWORDLT, OTPINVALID, OTPEXPIRED, SHOULDNOTHAVESAMEPASSWORD, SPORTALREADYEXIST, INTEREST, AUTHTOKENREQUIRED } = errorName;
+const { INVALIDEMAILORPASSWORD, INTERNALSERVER, USERALREADYEXISTS, EMAILNOTEXISTS, FULLNAMEREQUIRED, MOBILEREQUIRED, GENDERREQUIRED, PASSWORDREQUIRED, EMAILREQUIRED, EMAILFORMATEQUIRED, OTPLENGTH, OTPNOTEXISTS, PASSWORDGT, PASSWORDLT, OTPINVALID, OTPEXPIRED, SHOULDNOTHAVESAMEPASSWORD, SPORTALREADYEXIST, INTEREST, AUTHTOKENREQUIRED, NAMEREQUIRED, TOKENEXPIRED } = errorName;
 
 
 // Resolvers define how to fetch the types defined in your schema.
@@ -102,6 +102,7 @@ const userResolver = {
                 }
 
                 const encryptPass = jwt.sign({ email }, 'secretToken', { expiresIn: '5h' });
+                await User.findOneAndUpdate({ email }, { $set: { deviceId: [encryptPass] } });
                 result.token = encryptPass;
                 return result;
             } catch {
@@ -148,7 +149,7 @@ const userResolver = {
             try {
                 const { otpCode } = args.input;
                 const otpInvalid = String(otpCode);
-                if (otpInvalid.length > 4 || otpInvalid.length < 4) {
+                if (otpInvalid.length < 1) {
                     return handleError(OTPLENGTH.message, 'FORBIDDEN', OTPLENGTH.statusCode);
                 }
                 const fetchOtpDb = await ForgotPassword.findOne({ otp: otpCode });
@@ -222,6 +223,9 @@ const userResolver = {
         addSport: async (_, args, context) => {
             try {
                 const { name, image } = args.input;
+                if (name === "" || name === undefined || name.trim().length < 1) {
+                    return handleError(NAMEREQUIRED.message, 'FORBIDDEN', NAMEREQUIRED.statusCode)
+                }
                 const check = await Sport.findOne({ name });
                 if (check?.name == name) {
                     return handleError(SPORTALREADYEXIST.message, "FORBIDDEN", SPORTALREADYEXIST.statusCode);
@@ -237,8 +241,12 @@ const userResolver = {
         },
         addUserInterest: async (_, args, { user }) => {
             try {
-                if(user === undefined || user === ''){
+                if (user === undefined || user === '') {
                     return handleError(AUTHTOKENREQUIRED.message, 'FORBIDDEN', AUTHTOKENREQUIRED.statusCode);
+                }
+                console.log("saveInterest", user);
+                if (user?.deviceId == null) {
+                    return handleError(TOKENEXPIRED.message, 'FORBIDDEN', TOKENEXPIRED.statusCode);
                 }
                 console.log("saveInterest", user);
                 const userInterestList = args.input;
@@ -248,10 +256,25 @@ const userResolver = {
                     return handleError(INTEREST.message, 'FORBIDDEN', INTEREST.statusCode);
                 }
                 const saveInterest = await Interest.insertMany(userInterestList);
-                console.log("saveInterest", saveInterest);
                 return { message: "Interest Added." }
-            } catch(err) {
+            } catch (err) {
                 console.log("hhhhh", err);
+                return handleError(INTERNALSERVER.message, 'FORBIDDEN', INTERNALSERVER.statusCode);
+            }
+        },
+        logoutUser: async (_, args, { user }) => {
+            try {
+                const { token } = args.input;
+                // if (token === "" || token === undefined || token.trim().length < 1) {
+                //     return handleError(AUTHTOKENREQUIRED.message, 'FORBIDDEN', AUTHTOKENREQUIRED.statusCode)
+                // }
+                if (user === undefined || user === '') {
+                    return handleError(AUTHTOKENREQUIRED.message, 'FORBIDDEN', AUTHTOKENREQUIRED.statusCode);
+                }
+                await User.findOneAndUpdate({ email: user.email }, { $set: { deviceId: null } });
+                // const encryptPass = jwt.sign({ email: user.email }, 'secretToken', { expiresIn: '5h' });
+                return { message: "Logout Successfully!" }
+            } catch {
                 return handleError(INTERNALSERVER.message, 'FORBIDDEN', INTERNALSERVER.statusCode);
             }
         }

@@ -1,3 +1,5 @@
 # Ignore folders to deploy
 
 /node_modules
+
+.env

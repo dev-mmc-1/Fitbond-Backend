@@ -35,12 +35,16 @@ module.exports = {
         message: 'FullName required',
         statusCode: 400
     },
+    NAMEREQUIRED: {
+        message: 'Sports name required',
+        statusCode: 400
+    },
     EMAILFORMATEQUIRED: {
         message: 'Invalid email format.',
         statusCode: 400
     },
     OTPLENGTH: {
-        message: 'Otp should be 4 digits.',
+        message: 'OTP required!',
         statusCode: 400
     },
     OTPNOTEXISTS: {
@@ -68,7 +72,7 @@ module.exports = {
         statusCode: 400
     },
     SPORTALREADYEXIST: {
-        message: `Sport already exists.`,
+        message: `Sport Interest already exists for this user.`,
         statusCode: 400
     },
     INTEREST: {
@@ -79,8 +83,12 @@ module.exports = {
         message: `Authentication token required.`,
         statusCode: 401
     },
-    // FULLNAMELT: {
-    //     message: `Password length must not exceed 15 characters`,
+    TOKENEXPIRED: {
+        message: `Token expired.`,
+        statusCode: 400
+    },
+    // OTPREQUIRED: {
+    //     message: 'OTP required!',
     //     statusCode: 400
-    // },
+    // }
 }
